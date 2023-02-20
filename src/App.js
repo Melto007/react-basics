@@ -1,4 +1,5 @@
 import React, { useState, useReducer, useEffect, useRef } from 'react'
+import './index.css'
 
 const reducer = (state, action) => {
   switch(action.type) {
@@ -27,6 +28,8 @@ function App() {
   const [ loading, setLoading ] = useState(true)
 
   const inputRef = useRef()
+  const visibleText = useRef()
+  const greeting = useRef()
 
   const changePasswordStatus = () => {
     if(inputRef.current.type === "text") {
@@ -65,6 +68,17 @@ function App() {
   useEffect(() => {
     fetchAPI('https://jsonplaceholder.typicode.com/todos/')
   }, [])
+
+  const hideText = () => {
+    const heading = greeting.current.childNodes[0]
+    const propertyValue = getComputedStyle(heading)
+    if(propertyValue.display === 'none') {
+      visibleText.current.style.setProperty('display', 'block')
+    } else {
+      visibleText.current.style.setProperty('display', 'none')
+    }
+  }
+
   return (
     <React.Fragment>
         <div>
@@ -85,6 +99,11 @@ function App() {
         <div>
             <input type='password' ref={inputRef} />
             <input type="checkbox" onChange={changePasswordStatus} />
+        </div>
+
+        <div className='greeting' ref={greeting}>
+          <h1 className='hideText' ref={visibleText}>Hello World...!</h1>
+          <input type="checkbox" onChange={hideText} />
         </div>
 
         <div>
