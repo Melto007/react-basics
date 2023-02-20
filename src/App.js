@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react'
+import React, { useState, useReducer, useEffect } from 'react'
 
 const reducer = (state, action) => {
   switch(action.type) {
@@ -22,9 +22,39 @@ const reducer = (state, action) => {
 function App() {
   const [ counter, setCounter ] = useState(0)
   const [ title, setTitle ] = useState('')
+  const [ message, setMessage ] = useState(null)
+  const [ error, setError ] = useState(null)
+  const [ loading, setLoading ] = useState(true)
 
   const [ state, dispatch ] = useReducer(reducer, { count: 0 })
 
+  const fetchAPI = async (url) => {
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      if(!response.ok) {
+        throw new Error(
+          `This is an HTTP Error ${response.status}`
+        )
+      }
+      const data = await response.json()
+      setMessage(data)
+      setError(null)
+    } catch(error) {
+        setError(error.message)
+        setMessage(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchAPI('https://jsonplaceholder.typicode.com/todos/')
+  }, [])
   return (
     <React.Fragment>
         <div>
@@ -40,6 +70,17 @@ function App() {
           <button onClick={() => dispatch({ type: "INCREMENT" })}>+</button>
           <button onClick={() => dispatch({ type: "DECREMENT" })}>-</button>
           <button onClick={() => dispatch({ type: "RESET" })}>reset</button>
+        </div>
+
+        <div>
+          {loading && <p>Loading....</p>}
+          {message && message.map(data => (
+            <div key={data.key}>
+              <p>{data.title}</p>
+            </div>
+          ))}
+          {error && <p>This is a problem in fetching...</p>}
+          <button>New Joke</button>
         </div>
     </React.Fragment>
   );
