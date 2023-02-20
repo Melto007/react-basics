@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect } from 'react'
+import React, { useState, useReducer, useEffect, useRef } from 'react'
 
 const reducer = (state, action) => {
   switch(action.type) {
@@ -25,6 +25,16 @@ function App() {
   const [ message, setMessage ] = useState(null)
   const [ error, setError ] = useState(null)
   const [ loading, setLoading ] = useState(true)
+
+  const inputRef = useRef()
+
+  const changePasswordStatus = () => {
+    if(inputRef.current.type === "text") {
+      inputRef.current.type = 'password'
+    } else {
+      inputRef.current.type = 'text'
+    }
+  }
 
   const [ state, dispatch ] = useReducer(reducer, { count: 0 })
 
@@ -73,9 +83,14 @@ function App() {
         </div>
 
         <div>
+            <input type='password' ref={inputRef} />
+            <input type="checkbox" onChange={changePasswordStatus} />
+        </div>
+
+        <div>
           {loading && <p>Loading....</p>}
           {message && message.map(data => (
-            <div key={data.key}>
+            <div key={data.id}>
               <p>{data.title}</p>
             </div>
           ))}
